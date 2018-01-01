@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:mvc="http://www.springframework.org/schema/mvc" 
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xsi:schemaLocation="
+					http://www.springframework.org/schema/beans 
+					http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+					http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+					http://cxf.apache.org/jaxrs
+					http://cxf.apache.org/schemas/jaxrs.xsd
+					http://www.springframework.org/schema/tx 
+					http://www.springframework.org/schema/tx/spring-tx-3.2.xsd 
+					http://www.springframework.org/schema/aop 
+					http://www.springframework.org/schema/aop/spring-aop-3.2.xsd 
+					http://www.springframework.org/schema/context  
+					http://www.springframework.org/schema/context/spring-context-3.2.xsd
+					http://www.springframework.org/schema/jdbc 
+					http://www.springframework.org/schema/jdbc/spring-jdbc-3.2.xsd
+					http://www.springframework.org/schema/mvc
+					http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd"> 
+					
+	<context:annotation-config />
+
+	 <!-- 对web包中的所有类进行扫描，以完成Bean创建和自动依赖注入的功能 -->
+	<context:component-scan base-package="com.it.tu" />
+	<mvc:annotation-driven />
+
+	<tx:annotation-driven />
+
+	<!--  对模型视图名称的解析，即在模型视图名称添加前后缀 -->
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix">
+			<value>/WEB-INF/pages/</value>
+		</property>
+		<property name="suffix">
+			<value>.jsp</value>
+		</property>
+	</bean>
+
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">  
+	    <!-- 设置上传文件的最大尺寸为1MB -->  
+	    <property name="maxUploadSize">  
+	        <value>30485760</value>  
+	    </property>
+	    <property name="defaultEncoding"> 
+	        <value>UTF-8</value> 
+	    </property>
+	</bean>
+
+	<!-- i18n message source -->
+	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basenames" value="/WEB-INF/i18n/messages,/WEB-INF/i18n/enterprise,/WEB-INF/i18n/enterpriseregister" />
+		<property name="defaultEncoding" value="UTF-8"/>
+		<property name="cacheSeconds" value="30" />
+	</bean>
+
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<!--property name="driverClass" value="org.postgresql.Driver" />
+		<property name="jdbcUrl" value="jdbc:postgresql://localhost:5432/sysos" />
+		<property name="user" value="postgres" />
+		<property name="password" value="erisson" /-->
+
+        <property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/TTROS_GroupMng?allowMultiQueries=true&amp;useUnicode=true&amp;characterEncoding=utf-8" />
+		<property name="user" value="search" />
+		<property name="password" value="P@ssw0rd" />
+
+		<property name="acquireIncrement" value="10" />
+		<property name="minPoolSize" value="10" />
+		<property name="maxPoolSize" value="80" />
+		<property name="maxIdleTime" value="200" />
+
+	</bean>
+
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="packagesToScan" value="com.it.tu.beans" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.transaction.factory_class">org.hibernate.transaction.JDBCTransactionFactory</prop>
+			</props>
+		</property>
+		
+		
+	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+</beans>
